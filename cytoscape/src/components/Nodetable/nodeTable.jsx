@@ -33,11 +33,21 @@ const NodeDetailsTable = ({ nodes, cyRef }) => {
     },
   ];
 
+  const pageSize = 5; // Set the number of items per page
+
+  const paginationConfig = {
+    pageSize: pageSize,
+    showSizeChanger: false,
+  };
+
   return (
-    <div className="absolute z-10 p-4 mt-10 bg-white ">
+    <>
+    <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-500" />
+    <div className="z-10 p-4 bg-white rounded-md">
       <h2>Node Details Table</h2>
-      <Table dataSource={dataSource} columns={columns} />
+      <Table dataSource={dataSource} columns={columns} pagination={paginationConfig} />
     </div>
+    </>
   );
 };
 

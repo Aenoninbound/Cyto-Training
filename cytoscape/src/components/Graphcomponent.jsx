@@ -1,6 +1,7 @@
 // GraphComponent.js
 import React, { useEffect, useRef, useState } from "react";
 import cytoscape from "cytoscape";
+import { Button } from "antd";
 import { useAddNodeMutation, client } from "../utilities/graphOperations"; // Update the correct path
 import NodeDetailsTable from "./Nodetable/nodeTable";
 const GraphComponent = () => {
@@ -11,7 +12,7 @@ const GraphComponent = () => {
   const [selectedNodeProperties, setSelectedNodeProperties] = useState(null);
   const [showNodeDetails, setShowNodeDetails] = useState(false);
   const [addNode, { loading, error }] = useAddNodeMutation();
-  
+
   useEffect(() => {
     // Initialize Cytoscape
     const cy = cytoscape({
@@ -20,8 +21,8 @@ const GraphComponent = () => {
         { data: { id: "a", label: "Node A" } },
         { data: { id: "b", label: "Node B" } },
         { data: { id: "c", label: "Node C" } },
-        { data: { id: "ab", source: "a", target: "b", label: "connectsTo" } },
-        { data: { id: "bc", source: "b", target: "c", label: "connectsTo" } },
+        { data: { id: "ab", source: "a", target: "b" } },
+        { data: { id: "bc", source: "b", target: "c" } },
       ],
       style: [
         {
@@ -95,6 +96,7 @@ const GraphComponent = () => {
         ]);
 
         // Refresh the layout to accommodate the new node
+        cy.layout({ name: "grid" }).run();
       })
       .catch((error) => {
         console.error("Error adding node:", error);
@@ -111,59 +113,71 @@ const GraphComponent = () => {
   return (
     <>
       <body className="bg-black">
-        <div className="absolute z-10 font-semibold bg-white w-80">
-          {selectedNodeProperties && (
-            <div>
-              <h3>Selected Node Properties:</h3>
-              <p>Node ID: {selectedNodeProperties.nodeId}</p>
-              <p>
-                Position: {JSON.stringify(selectedNodeProperties.nodePosition)}
-              </p>
-              <p>Date: {selectedNodeProperties.nodeDate}</p>
-            </div>
-          )}
-          <label>
-            New Node Label:
-            <input
-              type="text"
-              value={newNodeLabel}
-              onChange={(e) => setNewNodeLabel(e.target.value)}
-            />
-          </label>
-          <label>
-            New Edge Label:
-            <input
-              type="text"
-              value={newEdgeLabel}
-              onChange={(e) => setNewEdgeLabel(e.target.value)}
-            />
-          </label>
-          <label>
-            Select Source Node:
-            <select
-              value={selectedSourceNodeId}
-              onChange={(e) => setSelectedSourceNodeId(e.target.value)}
+        <div className="fixed z-10 mt-3 ml-3 font-semibold bg-white rounded-lg w-80">
+          <form class="bg-white shadow-md rounded p-5">
+            {selectedNodeProperties && (
+              <div className="block mb-2 text-sm font-bold text-black">
+                <h3 className="">Selected Node Properties</h3>
+                <p>Node ID: {selectedNodeProperties.nodeId}</p>
+                <p>
+                  Position: {""}x:{" "}
+                  {selectedNodeProperties.nodePosition.x.toFixed(2)}, y:{" "}
+                  {selectedNodeProperties.nodePosition.y.toFixed(2)}
+                  {""}
+                </p>
+                <p>Date: {selectedNodeProperties.nodeDate}</p>
+              </div>
+            )}
+            <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-500" />
+            <label className="block mb-2 text-sm font-bold text-black">
+              Node Label:
+              <input
+                className="w-full px-3 py-2 leading-tight text-black border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                type="text"
+                value={newNodeLabel}
+                onChange={(e) => setNewNodeLabel(e.target.value)}
+              />
+            </label>
+            <label className="block mb-2 text-sm font-bold text-black">
+              Edge Label:
+              <input
+                className="w-full px-3 py-2 leading-tight text-black border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                type="text"
+                value={newEdgeLabel}
+                onChange={(e) => setNewEdgeLabel(e.target.value)}
+              />
+            </label>
+            <label>
+              Select Source Node:
+              <select
+                value={selectedSourceNodeId}
+                onChange={(e) => setSelectedSourceNodeId(e.target.value)}
+              >
+                <option value="">Select Node</option>
+                {nodeOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button className="bg-red-700" onClick={addNodeHandler}>
+              Add New Node
+            </Button>
+            <Button 
+              className="bg-blue-700"
+              onClick={() => setShowNodeDetails(!showNodeDetails)}
             >
-              <option value="">Select Node</option>
-              {nodeOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button className="bg-red-700" onClick={addNodeHandler}>
-            Add New Node
-          </button>
-          <button
-            className="bg-blue-700"
-            onClick={() => setShowNodeDetails(!showNodeDetails)}
-          >
-            {showNodeDetails ? "Hide Node Details" : "Show Node Details"}
-          </button>
-        {showNodeDetails && (
-        <NodeDetailsTable nodes={cyRef.current.nodes()} cyRef={cyRef} />
-      )}
+              {showNodeDetails ? "Hide Node Details" : "Show Node Details"}
+            </Button>
+            
+            <div className="">
+
+              {showNodeDetails && (
+                <NodeDetailsTable nodes={cyRef.current.nodes()} cyRef={cyRef} />
+              )}
+            </div>
+          </form>
         </div>
 
         <div
