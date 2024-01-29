@@ -10,7 +10,6 @@ const nodes = [
 
 const edges = [
   { id: 'ab', source: 'a', target: 'b', label: 'connectsTo' },
-  { id: 'bc', source: 'b', target: 'c', label: 'connectsTo' },
 ];
 
 const typeDefs = gql`
